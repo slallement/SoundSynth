@@ -14,12 +14,13 @@ int main()
 {
     srand (time(NULL));
     const unsigned int SCREEN_WIDTH = 1000;
+    const double inital_freq = 220.0; // Hz : the lowest note on the keyboard
 
     SoundManager music;
 
     double listNotes[30];
     for(int i=0;i<30;i++){
-        listNotes[i] = 220. * pow(2,static_cast<double>(i)/12.);
+        listNotes[i] = inital_freq * pow(2,static_cast<double>(i)/12.);
         //std::cout<<"note "<<i<<" fq: "<<listNotes[i]<<std::endl;
     }
 
@@ -60,7 +61,9 @@ int main()
     keyboard[sf::Keyboard::Num9] = listNotes[24+1];
     keyboard[sf::Keyboard::Num0] = listNotes[24+3];
 
-	sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH,400), "SFML works!");
+    // ---
+
+	sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH,400), "Sound Synth");
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);
 
@@ -70,7 +73,6 @@ int main()
     window.setKeyRepeatEnabled(false);
 
     // main loop
-
     while (window.isOpen())
     {
         sf::Event event;
@@ -89,16 +91,6 @@ int main()
 
         if(tempfreq > 0.){
             music.addNote(tempfreq);
-            //std::cout<<"note "<<tempfreq<<std::endl;
-            /*Sound.stop();
-            setRaw1(raw[0],SAMPLE_RATE, AMPLITUDE, tempfreq);
-            Buffer = sf::SoundBuffer();
-            if (!Buffer.loadFromSamples(&raw[0][0], SAMPLES, 1, SAMPLE_RATE)) {
-                std::cerr << "Loading failed!" << std::endl;
-                return 1;
-            }
-            Sound.setBuffer(Buffer);
-            Sound.play();*/
             tempfreq = -1.;
         }
 

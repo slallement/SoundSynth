@@ -2,15 +2,13 @@
 #include "../src/utils.cpp"
 
 Filter::Filter(std::vector<sf::Int16>* raw, double LPcoef) :
-    cutoff(LPcoef)
+    cutoff(LPcoef), input(raw)
 {
-    input = raw;
 }
 
-Filter::Filter(std::vector<sf::Int16>* raw)
+Filter::Filter(std::vector<sf::Int16>* raw):
+    input(raw)
 {
-    setSignal(raw);
-
 }
 
 Filter::Filter():
@@ -139,7 +137,6 @@ void Filter::setSignal(std::vector<sf::Int16>* raw)
 
 Complex<double> Filter::getDFTfilterLP1(double alpha)
 {
-    alpha = alpha/TWO_PI;
     Complex<double> filter;
     filter.resize(input->size());
     double w;

@@ -31,7 +31,7 @@ static inline int signi(float x){
     return (x > 0) ? 1 : (x==0) ? 0 : -1;
 }
 
-static const double TWO_PI = 6.28318;
+static const double TWO_PI = 6.2831853072;
 
 #include <cmath>
 

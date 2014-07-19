@@ -1,6 +1,8 @@
 #ifndef FILTER_H
 #define FILTER_H
 
+// class used to filter a signal in frequency
+
 #include <SFML/Audio.hpp>
 #include <cmath>
 #include <vector>
