@@ -3,8 +3,6 @@
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <map>
-#include <deque>
-#include <vector>
 
 #include "../include/SoundManager.h"
 
@@ -12,18 +10,19 @@ using namespace std;
 
 int main()
 {
-    srand (time(NULL));
-    const unsigned int SCREEN_WIDTH = 1000;
+    const unsigned int WINDOW_WIDTH = 1000;
+	const unsigned int WINDOW_HEIGHT = 400;
     const double inital_freq = 220.0; // Hz : the lowest note on the keyboard
 
     SoundManager music;
 
+	// compute the note frequency
     double listNotes[30];
-    for(int i=0;i<30;i++){
-        listNotes[i] = inital_freq * pow(2,static_cast<double>(i)/12.);
-        //std::cout<<"note "<<i<<" fq: "<<listNotes[i]<<std::endl;
+    for(int i=0; i<30; i++){
+        listNotes[i] = inital_freq * pow(2,static_cast<double>(i)/12.0);
     }
 
+	// KEYBOARD mapping for AZERTY keyboard
     std::map<unsigned, double> keyboard;
     keyboard[sf::Keyboard::W] = listNotes[0]; // C
     keyboard[sf::Keyboard::X] = listNotes[2];
@@ -33,10 +32,9 @@ int main()
     keyboard[sf::Keyboard::N] = listNotes[9]; // A
     keyboard[sf::Keyboard::Comma] = listNotes[11];
 
-    keyboard[sf::Keyboard::Comma] = listNotes[12];
-    keyboard[sf::Keyboard::Period] = listNotes[12+2];
-    keyboard[sf::Keyboard::Slash] = listNotes[12+4];
-    //keyboard[sf::Keyboard::] = listNotes[11];
+    keyboard[sf::Keyboard::Period] = listNotes[12];
+    keyboard[sf::Keyboard::Slash] = listNotes[12+2];
+    //keyboard[sf::Keyboard::Num1] = listNotes[12+4];
 
     keyboard[sf::Keyboard::A] = listNotes[12+0]; // C
     keyboard[sf::Keyboard::Z] = listNotes[12+2];
@@ -61,14 +59,22 @@ int main()
     keyboard[sf::Keyboard::Num9] = listNotes[24+1];
     keyboard[sf::Keyboard::Num0] = listNotes[24+3];
 
+	keyboard[sf::Keyboard::S] = listNotes[0 + 1];
+	keyboard[sf::Keyboard::D] = listNotes[0 + 3];
+
+	keyboard[sf::Keyboard::G] = listNotes[0 + 6];
+	keyboard[sf::Keyboard::H] = listNotes[0 + 8];
+	keyboard[sf::Keyboard::J] = listNotes[0 + 10];
+
+	keyboard[sf::Keyboard::L] = listNotes[12 + 1];
+	keyboard[sf::Keyboard::M] = listNotes[12 + 3];
+
     // ---
 
-	sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH,400), "Sound Synth");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Sound Synth");
 
     double tempfreq = -1;
-    double val = 0.;
+    float val = 0.0f;
 
     window.setKeyRepeatEnabled(false);
 
@@ -89,46 +95,40 @@ int main()
             }
         }
 
+		// play the appropriate notes
         if(tempfreq > 0.){
             music.addNote(tempfreq);
             tempfreq = -1.;
         }
 
         window.clear();
-        /*for(int i = 0; i<400; i++){
-            double val = 200.0+raw[i*SAMPLES/40000]*200./(2*AMPLITUDE);
-            sf::Vertex line[] =
-            {
-                sf::Vertex(sf::Vector2f(i, 200)),
-                sf::Vertex(sf::Vector2f(i, val))
-            };
-            line[0].color = sf::Color(255,0,0);
-            window.draw(line, 2, sf::Lines);
-        }*/
 
         music.update();
 
-        for(unsigned int i = 0; i<SCREEN_WIDTH; i++){
+		// draw the visualisation chart
+        for(unsigned int i = 0; i<WINDOW_WIDTH; i++){
             int value = music.getSumRaw(i);
             if(value != 0){
-                val = 200.0*(1.-1.*value/(music.AMPLITUDE*2));
-                if(val < 400. && val > 0.){
+                val = 200.0f*(1.0f-1.0f*value/(music.AMPLITUDE*2));
+                if(val < 400.0f && val > 0.0f){
+					float fi = (float)i;
 
+					// green area
                     sf::Vertex line[] =
                     {
-                        sf::Vertex(sf::Vector2f(i, 200)),
-                        sf::Vertex(sf::Vector2f(i, val))
+                        sf::Vertex(sf::Vector2f(fi, 200.0f)),
+                        sf::Vertex(sf::Vector2f(fi, val))
                     };
                     line[0].color = sf::Color(0,150,0);
                     line[1].color = sf::Color(0,205,25);
                     window.draw(line, 2, sf::Lines);
 
-                    int valAnt;
-                    valAnt = (i>0)? 200.0*(1.-1.*music.getSumRaw(i-1)/(music.AMPLITUDE*2)) : val;
+					// white line
+                    float valAnt = (i>0)? 200.0f*(1.f-1.f*music.getSumRaw(i-1)/(music.AMPLITUDE*2)) : val;
                     sf::Vertex line2[] =
                     {
-                        sf::Vertex(sf::Vector2f(i, valAnt)),
-                        sf::Vertex(sf::Vector2f(i, val))
+                        sf::Vertex(sf::Vector2f(fi, valAnt)),
+                        sf::Vertex(sf::Vector2f(fi, val))
                     };
                     line2[0].color = sf::Color(255,255,255);
                     line2[1].color = sf::Color(255,255,255);

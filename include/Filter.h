@@ -15,42 +15,54 @@ struct Complex
 {
     std::vector<T> re;
     std::vector<T> im;
-    inline void resize(int size){
-        re.resize(size);
-        im.resize(size);
-    }
-    inline unsigned int size(){
+
+	inline void resize(size_t size)
+	{
+		re.resize(size);
+		im.resize(size);
+	}
+    inline size_t size() const
+	{
         return re.size();
     }
 };
 
+namespace FilterTool
+{
+	template<typename T>
+	static Complex<T> mul(const Complex<double> & a, const Complex<double> & b);
+	/** Discrete fourier transform */
+	template<typename T>
+	static Complex<double> getDFTsignal(std::vector<T> const& input);
+	/** Discrete fourier transform inverse */
+	template<typename T>
+	static std::vector<T> getDFTinverse(const Complex<double> & input);
+}
+
+/** A basic low pass filter filter a array of vector<T> 
+ * the output is given by getOutput()
+*/
+template<typename Tin>
 class Filter
 {
     public:
-        Filter();
-        Filter(std::vector<sf::Int16>* raw,  double LPcoef);
-        Filter(std::vector<sf::Int16>* raw);
-        virtual ~Filter();
-        void setSignal(std::vector<sf::Int16>* raw);
-        std::vector<sf::Int16> getOutput();
 
-        static Complex<double> getDFTsignal(std::vector<sf::Int16> const& input);
-        void compute();
-        void compute1();
+        Filter();
+        Filter(std::vector<Tin>* raw,  double LPcoef);
+        Filter(std::vector<Tin>* raw);
+        virtual ~Filter();
+        void setInput(std::vector<Tin>* raw);
+		std::vector<Tin> getOutput();
+        
     protected:
+		void compute();
+		void compute1();
         Complex<double> getDFTfilterLP1(double alpha);
-        std::vector<sf::Int16> getDFTinverse(Complex<double> & sfiltered);
-        std::vector<double> getDFTinverseD(Complex<double> & sfiltered);
-        Complex<sf::Int16> iconvolution(Complex<double> & asignal, Complex<double> & bfilter);
-        Complex<double> dconvolution(Complex<double> & asignal, Complex<double> & bfilter);
+
         double cutoff;
     private:
-        std::vector<sf::Int16>* input;
-        //Complex<double> input;
-        /*Complex<double> filter;
-        Complex<sf::Int16> filtered;*/
-        std::vector<sf::Int16> output;
-
+        std::vector<Tin>* input;
+        std::vector<Tin> output;
 
 };
 

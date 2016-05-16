@@ -19,23 +19,23 @@ void SoundManager::setRaw(std::vector<sf::Int16> & raw, int AMPLITUDE, double fr
         return;
     }
 
-    std::vector<sf::Int16> base(2*SAMPLE_RATE/freq,0);
+    std::vector<sf::Int16> base((sf::Int16)(2*SAMPLE_RATE/freq), 0);
 	const double increment = freq/SAMPLE_RATE;
 	double x = 0;
 
 	for (unsigned i = 0; i < base.size(); i++) {
-	    base[i] = 0.;
+	    base[i] = 0;
 	    // different wave shape:
         //base[i] = AMPLITUDE * sin(x*TWO_PI);
 		//base[i] += AMPLITUDE * (mod(static_cast<int>(x),2)-0.5);
-        base[i] += AMPLITUDE/2 *sin(x*TWO_PI/2)*sin(x*TWO_PI);
+        base[i] += (sf::Int16)(AMPLITUDE/2 *sin(x*TWO_PI/2)*sin(x*TWO_PI));
 		//base[i] += rand()%(AMPLITUDE/2)-AMPLITUDE/4;
         /*if(raw[i] > AMPLITUDE*0.25*sin(x*TWO_PI) )
             raw[i] = AMPLITUDE*0.2;*/
 		x += increment;
 	}
 
-	Filter f(&base, 100.0);base = f.getOutput();
+	Filter<sf::Int16> f(&base, 100.0);base = f.getOutput();
     raw = repeat(base,freq);
 	setADSR(raw);
 
@@ -50,17 +50,17 @@ void SoundManager::setRaw(std::vector<sf::Int16> & raw, int AMPLITUDE, double fr
         return;
     }
 
-    std::vector<sf::Int16> base(2*SAMPLE_RATE/freq,0);
+    std::vector<sf::Int16> base((sf::Int16)(2*SAMPLE_RATE/freq),0);
 	const double increment = freq/SAMPLE_RATE;
 	double x = 0;
 	for (unsigned i = 0; i < base.size(); i++) {
-		base[i] = AMPLITUDE * function(x);
+		base[i] = (sf::Int16)(AMPLITUDE * function(x));
 		x += increment;
 	}
 
 	const double filterCutoff = 50.0;
 
-	Filter f(&base, filterCutoff);
+	Filter<sf::Int16> f(&base, filterCutoff);
 	base = f.getOutput();
     raw = repeat(base,freq);
 	setADSR(raw);
@@ -70,7 +70,7 @@ void SoundManager::setRaw(std::vector<sf::Int16> & raw, int AMPLITUDE, double fr
 
 std::vector<sf::Int16> SoundManager::repeat(std::vector<sf::Int16> & raw, double freq){
     std::vector<sf::Int16> result(SAMPLES);
-    unsigned int nb = result.size()/raw.size();
+    unsigned int nb = (unsigned int)(result.size() / raw.size());
     for (unsigned i = 0; i < raw.size(); i++) {
         for (unsigned int j = 0; j < nb; j++) {
             result[i+j*raw.size()] = raw[i];
@@ -92,8 +92,7 @@ void SoundManager::setADSR(std::vector<sf::Int16> & samp){
 	        if(ampModulation < 0.001)
                 ampModulation = 0.;
 	    }
-		samp[i] *= ampModulation;
-
+		samp[i] *= (sf::Int16) ampModulation;
 	}
 }
 
@@ -144,7 +143,7 @@ int SoundManager::getRaw(unsigned int note, unsigned int i)
 {
     if(sound[note].getStatus() != 2)
         return 0;
-    unsigned int pos = buffer[note].getSampleCount()
+    sf::Uint64 pos = buffer[note].getSampleCount()
                 *sound[note].getPlayingOffset().asMilliseconds()/1000+i*1;
     if(pos < 0 || pos >= buffer[note].getSampleCount() )
         return 0;
@@ -157,7 +156,7 @@ int SoundManager::getLastRaw(int i)
         return 0;
     if(sound.back().getStatus() != 2)
         return 0;
-    unsigned int pos = buffer.back().getSampleCount()
+    sf::Uint64 pos = buffer.back().getSampleCount()
                 *sound.back().getPlayingOffset().asMilliseconds()/1000+i*1;
     if(pos < 0 || pos >= buffer.back().getSampleCount() )
         return 0;
