@@ -13,9 +13,7 @@ int main()
     const unsigned int WINDOW_WIDTH = 1000;
 	const unsigned int WINDOW_HEIGHT = 400;
     const double inital_freq = 220.0; // Hz : the lowest note on the keyboard
-
-    SoundManager music;
-
+	
 	// compute the note frequency
     double listNotes[30];
     for(int i=0; i<30; i++){
@@ -70,6 +68,7 @@ int main()
 	keyboard[sf::Keyboard::M] = listNotes[12 + 3];
 
     // ---
+	SoundManager music;
 
 	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Sound Synth");
 
@@ -106,7 +105,7 @@ int main()
         music.update();
 
 		// draw the visualisation chart
-        for(unsigned int i = 0; i<WINDOW_WIDTH; i++){
+        for(unsigned int i = 0; i<WINDOW_WIDTH; ++i){
             int value = music.getSumRaw(i);
             if(value != 0){
                 val = 200.0f*(1.0f-1.0f*value/(music.AMPLITUDE*2));
@@ -137,7 +136,6 @@ int main()
             }
         }
 
-        //window.draw(shape);
         window.display();
     }
     return EXIT_SUCCESS;
